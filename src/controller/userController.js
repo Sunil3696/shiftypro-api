@@ -77,8 +77,41 @@ const logoutUser = (req, res) => {
     });
 };
 
+const changePassword = async (req, res) => {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.session.userId; // Assuming user is authenticated and userId is stored in session
+
+    if (!userId) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    if (!currentPassword || !newPassword) {
+        return res.status(400).json({ message: 'Both current and new passwords are required' });
+    }
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const isPasswordValid = await user.isValidPassword(currentPassword);
+        if (!isPasswordValid) {
+            return res.status(400).json({ message: 'Current password is incorrect' });
+        }
+
+        user.password = newPassword; // Assuming password hashing is handled in the model
+        await user.save();
+        
+        res.status(200).json({ message: 'Password changed successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error occurred while changing password');
+    }
+};
 
 
 
 
-module.exports = {registerUser, loginUser,logoutUser}
+
+module.exports = {registerUser, loginUser,logoutUser,changePassword}

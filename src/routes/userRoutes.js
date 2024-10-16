@@ -12,11 +12,13 @@ const {
   registerUser,
   loginUser,
   logoutUser,
+  changePassword
 } = require("../controller/userController");
 
 //registering routes here
 router.post("/register", validateUser, registerUser);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
+router.post('/reset', changePassword)
 
 module.exports = router; //exporting router
